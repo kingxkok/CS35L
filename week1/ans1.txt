@@ -1,0 +1,201 @@
+lnxsrv09.seas.ucla.edu was used.
+
+
+
+How can you get man to print all the commands that have a specific word in
+ their man page (or at least the description part of the man page)? 
+ (hint: man man)
+
+
+man -k [specific word]
+
+
+
+
+Where are the cp and wc programs located in the file system?
+
+
+usr/local/cs/coreutils-8.28/bin/
+
+
+
+
+What executable programs have names that are just one character long, 
+and what do they do?
+
+
+ [filename] runs and executes filename
+ : [arguments]
+      No effect; the command does nothing beyond expanding arguments and 
+      performing any  specified  redirections.  A zero exit code is returned.
+      X attempts to start and X server
+ w shows who is logged on and what they're doing
+
+
+
+
+ When you execute the command named by the symbolic link /usr/bin/emacs,
+  which file actually is executed?
+
+
+/usr/bin/emacs-24.3
+
+
+
+
+The chmod program changes permissions on a file. What does the symbolic
+ mode g+s,o-x mean, in terms of permissions?
+
+
+g+s sets the set-user-id permission bit for the file's group
+o-x removes the execute permission from others (not in group)
+
+
+
+
+What option to find lets you search for files that have been modified in
+ the last three weeks?
+
+
+man find
+/modified
+
+
+
+
+
+Use the previous answer to find all directories modified in the last 
+three weeks.
+
+
+/sbin
+/var
+/parser.out
+/usr
+/boot.bkp
+/root
+/opt
+/lib64
+/home
+/lib
+/.autorelabel
+/lost+found
+/w
+/srv
+/bin
+/media
+/space
+/mnt
+/parsetab.py
+/u
+
+
+(within depth 1 from /)
+
+
+
+
+
+Of the files in the same directory as find, how many of them are 
+symbolic links?
+
+
+293
+
+
+
+
+What is the oldest regular file in the /usr/lib directory?
+
+
+libgpg-error.so.0.10.0
+
+
+
+
+
+Where does the locale command get its data from?
+
+
+LC_* environment variables
+
+
+
+
+
+In Emacs, what commands have sort in their name?
+
+
+Possible completions are:
+Buffer-menu-sort             sort-columns                 
+sort-fields                  sort-lines
+sort-numeric-fields          sort-pages                   
+sort-paragraphs              sort-regexp-fields
+tabulated-list-col-sort      tabulated-list-sort
+
+
+
+
+Briefly, what do the Emacs keystrokes C-M-a through C-M-h do? 
+Can you list their actions concisely?
+
+
+C-M-a           beginning-of-defun
+go to beginning of funcion definition
+C-M-b           backward-sexp
+go to beginning of the balanced expression where cursor is
+C-M-c           exit-recursive-edit
+return to the unfinished command after a recursive edit
+C-M-d           down-list
+move to the right of the next left paren
+C-M-e           end-of-defun
+move to end of function defintion
+C-M-f           forward-sexp
+go to end of the balanced expression where cursor is
+C-M-h           mark-defun
+highlight current function definition
+
+
+
+
+In more detail, what does the Emacs keystroke C-g do?
+
+
+C-g             keyboard-quit
+
+
+keyboard-quit is an interactive compiled Lisp function in `simple.el'.
+
+
+(keyboard-quit)
+
+
+Signal a `quit' condition.
+During execution of Lisp code, this character causes a quit directly.
+At top-level, as an editor command, this simply beeps.
+
+
+When in middle of writing a command (e.g. after a C-x or M-x),
+C-g cancels
+
+
+What does the Emacs yank function do?
+
+
+yank         <menu-bar> <edit> <paste>, <S-insert>, <S-insertchar>, C-y
+   Reinsert ("paste") the last stretch of killed text.
+
+
+
+
+
+
+
+When looking at the directory /usr/bin, what's the difference between 
+the output of the ls -l command, and the directory listing of the 
+Emacs dired command?
+
+
+dired lists files that start with '.' ('invisible' files that are understood
+ to be shown only when explicitly asked for)
+ ls -l doesn't

@@ -1,0 +1,30 @@
+Banshee: Bandwidth-efficient DRAM caching with in-package DRAM
+via Software/Hardware cooperation
+
+Intel and MIT and ETH Zurich
+
+
+in-package DRAM is same ish latency but much higher throughput
+but most cache designs optimize for hit latency, not bandwidth
+so not good for in-package DRAM as cache
+
+Enter Banshee: same latency but higher bandwidth efficency
+Eliminate bandwidth overhead by elimniating costly 
+tag access through virtual memory
+and instead use hardware extension to tlb with tags and tag buffer
+
+Lot of traffic in DRAM with current design goes to meta data management
+tags, LRU bits and cache replacement
+
+
+Previous design PTE/TLB-based DRAM cache has TLB coherency problem
+must update TLB each time DRAM cache is modified to keep track of which memory is in DRAM cachce (in package) or out
+Forces replacement to happen every cache miss means
+low bandwidth efficiency replacement policy
+
+vs. Banshee can use frequency-based replacement.
+
+
+
+SLIDES
+Mem arch: IN-PACKAGE RAM

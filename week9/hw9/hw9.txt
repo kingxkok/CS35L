@@ -1,0 +1,101 @@
+Week 9 Homework: Managing Change
+Ng Xian Kai
+
+1. hi!
+
+2.
+$ git checkout v3.0 -b quote
+Switched to a new branch 'quote'
+
+3.
+$ patch -p1 < ../quote-3.0-patch.txt
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+4.
+Instructions weren't so clear on the wiki page
+on how to use it...
+do I emacs a file ?
+
+Turns out I just run emacs in the dir and C-x 4-a
+
+5. 
+Referenced git-log.txt for proper formatting of the ChangeLog message
+
+First line is turned into subject in the patch file, so for the patch output
+to be properly formatted, we remove the date, name and email line, and the 
+tabs of the standard ChangeLog format.
+
+$ cat ChangeLog
+maint: quote 'like this' or "like this", not `like this'
+
+This is in response to a recent change in the GNU coding standards,
+which now suggest quoting 'like this' or "like this", instead of
+`like this' or ``like this''.
+* src/cmp.c (try_help, specify_ignore_initial, usage, main):
+* src/diff.c (main, try_help, option_help_msgid, specify_value)
+(compare_files):
+* src/diff3.c (main, try_help, option_help_msgid, usage)
+(read_diff):
+* src/dir.c (compare_names):
+* src/sdiff.c (try_help, usage, check_child_status, main):
+* src/util.c (finish_output):
+Quote 'like this' in output.
+
+6.
+$ git commit -aF ChangeLog
+
+7.
+$ git format-patch -1 --stdout > formatted-patch.txt
+
+smooth sailing :D
+
+8.
+sent my formatted-patch.txt to Xilai and he sent his to mine over 
+facebook messenger
+$ git checkout v3.0 -b partner
+$ git am ../formatted-patch.txt
+$ ./bootstrap
+$ ./configure
+$ make
+$ make check
+$ wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/diffutils-gets.diff
+$ patch -p1 < diffutils-gets.diff
+use lib/stdio.in.h
+$ make
+$ make check
+Xilai's patch has same make check errors as I did (refer to lab9.txt)
+So I'm pretty sure it's ok.
+$ ./src/diff --help  | grep '`'
+$ ./src/diff . - 2>&1 | grep '`'
+$ ./src/sdiff . - 2>&1 | grep '`'
+and other tests with diff3 and cmp
+output no grave accents
+so yay!
+
+
+9.
+$ make distdir
+$ cd diffutils-3.0.1-a9d0
+his ChangeLog entry is reflected on the ChangeLog file 
+(mine works for him too :) )
+
+10.
+Installed VcXsrv (from ssh lab)
+on my local machine:
+$ ssh -X xian@lnxsrv09.seas.ucla.edu
+$ cd ~eggert/src/gnu/emacs
+$ gitk
+scroll thru the box with dates with the bar
+to the newest change on the 24th of Jan 2015
+Since I'm assuming not newer than
+25th Jan means before 00:00 on Jan 25
+i.e. Jan 24 23:59 or earlier
+
+did PrtScr pasted to paint and saved
+and wrote my observations into ASCII characters
+$ brain-describe gitk-screenshot.png >> gitk-description.txt  # haha

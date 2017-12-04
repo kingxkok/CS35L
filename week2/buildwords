@@ -1,0 +1,25 @@
+#!/bin/bash
+
+
+#WEBPAGE="`wget -qO-  http://mauimapp.com/moolelo/hwnwdseng.htm`"
+WEBPAGE=$(cat)
+
+temp1=$(sed s/\<.u\>//g <<< "$WEBPAGE")
+temp2=$(sed s/\<u\>//g <<< "$temp1")
+temp1=$(tr '`' \' <<< "$temp2")
+temp2=$(sed '1,/Adopt/d' <<< "$temp1")
+temp1=$(sed 's/Kou/Kou\neeennnddd/' <<< "$temp2")
+temp2=$(sed '/eeennnddd/,$d' <<< "$temp1")
+temp1=$(sed '/\<tr\>/,/\<td\>/ d' <<< "$temp2" )
+temp2=$(sed s/\<td\>// <<< "$temp1")
+temp1=$(sed s/\<.td\>// <<< "$temp2")
+temp2=$(tr A-Z a-z <<< "$temp1")
+temp1=$(tr -c 'pkmnwlhaeiouPKMNWLHAEIOU\,'\'[:space:] '[@*]' <<< "$temp2")
+temp2=$(tr -cs 'pkmnwlhaeiouPKMNWLHAEIOU'\'\@ '[\n*]' <<< "$temp1")
+temp1=$(sed -e '/\@/d'  -e '/^$/ d' <<< "$temp2")
+temp2=$(sort -u <<< "$temp1")
+
+
+echo "$temp2"
+
+

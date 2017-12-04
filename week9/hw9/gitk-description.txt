@@ -1,0 +1,11 @@
+5 (five sections)
+Top Left: Tree of commits in almost reverse chronological order
+			with commimt messages' subject
+Bottom Left: Displays Comment (ChangeLog) of commits (and the diff texts) or the file contents
+				Adjsutible by the Bottom Right menu box
+Upper Middle: Corresponding list of names and emails to the commits
+Upper Right: Corresponding Date and Time of the commits
+Bottom Right: Allows user to select between Tree or Patch
+		Tree lets us see the directory in tree form and 
+			select which files we want to view on the bottom left box
+		Patch shows the Comment and the diffs

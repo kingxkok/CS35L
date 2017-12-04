@@ -1,0 +1,297 @@
+How can you get man to print all the commands that have a specific word 
+in their man page (or at least the description part of the man page)? 
+(hint: man man)
+
+man man
+/apropos
+
+
+
+
+Where are the cp and wc programs located in the file system?
+
+echo $PATH
+cd usr/local/cs/bin
+ls -l | grep cp
+ls -l | grep wc
+
+
+
+
+What executable programs have names that are just one character long, 
+and what do they do?
+
+
+man compgen
+/compgen
+n n
+compgen -c | grep -o -w [^?] > ~/Desktop/out.txt
+man .
+man :
+man X
+q
+X
+man w
+
+
+
+When you execute the command named by the symbolic link /usr/bin/emacs, 
+which file actually is executed?
+
+cd /usr/bin/
+ls -l | grep emacs
+cd /etc/alternatives
+ls -l | grep emacsg+s
+
+
+
+The chmod program changes permissions on a file. What does the symbolic 
+mode g+s,o-x mean, in terms of permissions?
+
+man chmod
+/symbolic mode
+
+
+
+
+What option to find lets you search for files that have been modified in
+ the last three weeks?
+
+man find
+/modified
+
+
+
+
+Use the previous answer to find all directories modified in the last 
+three weeks.
+
+cd /
+find -mtime +21 -maxdepth 1
+
+
+
+Of the files in the same directory as find, how many of them are 
+symbolic links?
+
+cd /
+find find
+cd /usr/bin
+find -type l
+
+
+
+What is the oldest regular file in the /usr/lib directory?
+
+cd /usr/lib
+ls -lt
+
+
+
+
+Where does the locale command get its data from?
+
+man locale
+echo $LANG
+env | grep L
+
+
+
+
+In Emacs, what commands have sort in their name?
+
+e m a c s ENTER
+-x SP * s o r t TAB
+
+
+
+
+Briefly, what do the Emacs keystrokes C-M-a through C-M-h do? 
+Can you list their actions concisely?
+
+e m a c s ENTER
+C-h b
+C-x o
+C-s C - M -
+
+
+
+
+In more detail, what does the Emacs keystroke C-g do?
+
+e m a c s ENTER
+C-h b
+C-x o
+C-s C - g
+C-h C-h f
+C-s k e y b o a r d - q u i t ENTER
+
+
+
+
+What does the Emacs yank function do?
+
+C-h C-h f
+C-s y a n k ENTER
+
+
+When looking at the directory /usr/bin, what's the difference between 
+the output of the ls -l command, and the directory listing of the 
+Emacs dired command?
+
+e m a c s ENTER
+M-x d i r e d ENTER
+
+(in another ssh terminal)
+
+cd ~
+ls -l
+
+
+
+////////////////////
+Homework Keystrokes
+///////////////////
+
+wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/assign1.html
+cp assign1.html exer1.html
+cp assign1.html exer3.html
+cp assign1.html exer3.html
+
+////
+1.1
+////
+
+e m a c s SP e x e r 1 . h t m l
+C-s P U B L I C ENTER
+C-s L a b o r a t o r y ENTER
+C-s s e l f - r e f e r e n t i a l
+C-e
+C-a
+I used the commands
+
+////
+1.2
+////
+
+e m a c s SP e x e r 2 . h t m l
+C-s < ! - -
+C-a
+SHIFT-DOWN BACKSPACE
+C-s DELETE C-a
+SHIFT-DOWN
+C-s h t t p s : / / e n . w i k i  C-s
+C-a UP SHIFT-DOWN-DOWN-DOWN Backspace
+C-s < ! - - ENTER Backspace Backspace Backspace Backspace Del Del Del
+C-s C-a SHIFT-DOWN Backspace
+
+////
+1.3
+////
+
+C-s m e n t 1 ENTER Backspace 37
+C-s m e n t 1 ENTER Backspace 37
+M-% U T F - 8 ENTER U S - A S C I I ENTER y
+ESC <
+C-s < / o l C-a ENTER
+
+////
+1.4
+////
+
+e m a c s SP e x e r 4 TAB ENTER
+ESC >
+SHIFT-UP SHIFT-LEFT M-w M-g M-g 3 5 0 ENTER C-y
+ESC >
+C-r - < C-r RIGHT SHIFT-DOWN SHIFT-LEFT M-w
+M-g M-g 3 3 5 ENTER SHIFT-DOWN Backspace C-y
+ESC >
+C-r C-r C-r SHIFT-DOWN-DOWN-DOWN M-w
+M-g M-g 3 0 1 ENTER C-y UP DEL UP DEL UP DEL
+ESC >
+C-r C-r C-r C-r RIGHT SHIFT-DOWN M-w
+M-g M-g 9 2 ENTER C-y
+ESC >
+C-r C-r C-r C-r C-r SHIFT-DOWN SHIFT-DOWN M-w
+M-g M-g 1 8 ENTER C-y UP UP DEL
+ESC > SHIFT-UP [Hold until right after end of resource comment] Backspace
+C-x u
+C-r - - - C-r ENTER < ! - - DOWN DOWN DOWN DOWN DOWN DOWN DOWN < ! - -
+DOWN DOWN DOWN DOWN DOWN DOWN DOWN DOWN < ! - -
+DOWN DOWN DOWN DOWN DOWN DOWN DOWN DOWN DOWN DOWN < ! - -
+DOWN DOWN DOWN DOWN DOWN DOWN DOWN C-e LEFT LEFT LEFT LEFT LEFT
+//those comments in the diff file 
+//mess with the supposedly enclosing comments...
+ESC < M-% < o l > ENTER < O l > !
+
+////
+1.5
+////
+
+mkdir junk
+cd junk
+touch hello.c
+C-c on the assignment webpage
+emacs hello.c
+RIGHT-CLICK
+<-x c o m p i l e ENTER C-a C-k
+g c c SP h e l l o . c ENTER
+M-! F10 DOWN h e l l o - TAB ENTER
+cat hello-out >> ../Desktop/key1.txt
+
+#include <stdio.h>
+int
+main (void)
+{
+  char n = '\n';
+  char b = '\\';
+  char q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn';%c  char b = '%c%c';%c  char q = '%c';%c  char const *p = %c%s%c;%c  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);%c  return 0;%c}%c";
+  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);
+  return 0;
+}
+
+////
+1.6
+////
+
+C-x b *scratch* ENTER
+( r a n d o m ) C-j ENTER
+( s e t q SP x SP ( r a n d o m ) )
+( s e t q SP y SP ( r a n d o m ) )
+(* SP x SP y)
+
+-511252839354554012
+
+M-: gives
+-511252839354554012 (#o343475244012767124544, #x38e7aa4057dca964)
+(Octal, Hex) representations of the output.
+
+ Starting from any given seed, the random function 
+ always generates the same sequence of numbers.
+ (random) is a deterministic function; given the same seed, 
+ it'll output the same sequence of numbers.
+ 
+ numbers in elisp ranges from -2^60 to 2^60-1 on a 64-bit machine
+ (random)*(random) overflows if it exceeds 2^60-1 or goes below -2^60
+ To get how many possible non-overflows, we can thus
+ sum  k*2^60/x from x=1 to x=2^60, for some constant k, 
+ which is needed as we also need
+ to consider multiplying negative numbers.
+ for x ranging over a large swath of numbers, 
+ we can approximate this with and integral:
+ integrate k*2^60/x from 1 to 2^60 to get 
+ 2^60*log(2^60)*k2 for another constant k2.
+ via experimentation for values representable by 16 bits, 
+ i found that k2=3 closely approximates
+ the actual values. Within 3% for 16 bit case. 
+ I realised there must be a missing component.
+ I forgot about the *0 cases! We should add 2^(num_bits-1).
+ I achieved within 0.4% accuracy for 16-bit case. 
+ I expect the 61-bit case would be accurate to
+ 10 significant figures, since every 4 bits seems to add a sigfig of accuracy.
+
+ Final answer: 1 - ~(3*2^60*60+2*60)/(2^61*2^61) = 1 - ~181/2^62. 
+ where '~' means approximately
+ Very close to 100%.
+ 

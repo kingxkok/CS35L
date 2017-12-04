@@ -1,0 +1,251 @@
+LABORATORY
+
+referenced tr.c from coreutils
+saw the lookup table that mapped a char
+to its replacement
+it's a great fast method!
+so I emulated it.
+
+had some trouble with read
+turns out i was giving it a char pointer that pointed
+to unallocated memory
+HAHA!
+
+
+
+STRACE
+
+tr2u would write in 1 byte blocks while
+tr2b calls write in 512byte blocks or
+	until the end of a line if it's < 512 bytes
+
+
+
+
+TIMING
+
+Compared using assign5 webpage
+wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/assign5.html
+gcc -o tr2u tr2u.c
+gcc -o tr2b tr2b.c
+time ./tr2u abcde bcdef < assign5.html
+time ./tr2b abcde bcdef < assign5.html
+
+
+I did time manualy about 5 times each
+
+real was ~2s for tr2u
+sys was ~0.8s for tr2u
+
+real was ~0.2s for tr2b
+sys was ~ 0.06s for tr2b
+
+
+
+With a 6mb file  (wget http://norvig.com/big.txt)
+tr2u 
+real 6m51.444s
+user 0m4.422s
+sys 4m21.000s
+
+tr2b 
+real 0m12.450s
+user 0m0.188s
+sys 0m4.641s
+
+user was 0s for both since I used lookup table
+
+
+
+
+HOMEWORK
+
+fstat to get file size
+change to read/write
+
+read and write use pointers 
+so change 
+char curr = getchar()
+to
+char curr;
+char* curr_p = &curr;
+read(0, curr_p, 1);
+
+what does work with mutating file mean???
+
+couldn't really get it to 'work' with maps file
+it just gave empty file (but it worked in the sense that it didn't error)
+probably because the 2nd attempt to read still returned 0
+(my program has do while so it attempts to read at least twice)
+...which is prolly coz maps mutates to slowly
+
+SO, I made a grower.sh file
+
+#!/bin/bash
+COUNTER=1
+while true; do
+  echo "$COUNTER"
+done >> ./big.txt
+
+
+this will append "1\n" repeatedly to my big (6mb) file
+which should (and did) append to the file
+before the inital read finishes
+and so cause the 2nd read to not return 0
+
+my program worked great with this, continuing to read as the file grows
+but for some reason at times, the read errors with EFAULT 
+meaning I tried to read into an invalid/unallocated buf
+but in debugging the error I printed buffer_size and total_read
+...I had a buffer (hehe) of ~600+/-200 each time
+(Note: I found the EFAULT read errors by running strace)
+(strace ./sfrobu < big.txt > out.txt)
+
+I suspect the error to be from read being kind of async
+w.r.t. my program and so it may have read ahead
+before my program checked and found that not enough
+memory had been allocated (the total_read hadn't been updated on time)
+
+Further support for my hypothesis of reading before allocating:
+using 
+
+#!/bin/bash
+COUNTER=1
+let COUNTER="COUNTER + 1"
+while true; do
+  echo "$COUNTER"
+  let COUNTER="COUNTER + 1" 
+done >> ./big.txt
+
+made the problem disappear/happen a lot less often
+likely since as COUNTER grew, the bytes read per read call
+increased, so each read call took a bit longer
+just long enough for my main program to detect that memory needed 
+to be allocated.
+
+Thus, I added a buffer (hehe) to my check memory reallocation
+	if(total_read >= buffer_size){
+		<code to realloc>
+	} 
+		changed to
+	if(total_read + 1024 >= buffer_size){
+		<code to realloc>
+	} 
+
+Note: I goofed in writing the grower.sh file with growing COUNTER
+as 
+COUNTER=COUNTER+1 
+didn't seem to work for me
+so I found the method using let instead
+let COUNTER="COUNTER + 1"
+
+
+In writing sfrobu.c I kept compiling every ~5 line changes
+to make sure no syntax errors were there
+
+made a my_write function to conveniently write
+by just inputting a char*
+it'll automatically write everything to stdout until a ' ' char
+
+
+ME STUPID TYPO
+got segfault
+gdbed and saw 0x4006c7
+objdump -d sfrobu > dumpfile
+
+found online backtracing code
+
+//backracer
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
+..in main...
+int 
+main(int argc, char** argv){
+	...
+	signal(SIGSEGV, handler);
+	...
+}
+
+annnnnnd after all 2 hours of crap with gdb
+I just decided to comment out line by line to 
+isolate the problem
+TURNS OUT
+my space ignoring incrementer
+	while(*charIter = ' ') charIter++; //ignore extra spaces
+....................^... had a single equals
+
+
+tested with leading spaces and found that I didn't ignore spaces
+for my original sfrob :c
+owel, fixed for this one!
+
+SPEEEEEED
+timed my sfrobu and it was really slow
+I realised my read was fast but I wrote each word
+one at a time
+I decided to write to a buffer first and then call write
+for them all at once
+
+Modified my_write to write to a buffer instead
+had some trouble with the output being different
+but I realized it's bcz i forgot a space
+(I checked their differences using diff)
+
+seems like I'm making a lot of bad mistakes :c
+
+
+SCRIPT VERSION
+
+wrote a c program to print every char from 0 to octal 377 (0xFF)
+to itself XORed with 42
+print in octal because \somenum takes octal values of ascii code
+from man tr:    \NNN   character with octal value NNN (1 to 3 octal digits)
+
+
+#include "stdio.h"
+
+int main(void){
+	for(unsigned int c = 0; c <= 0xFF; c++){
+		printf("\\%o", (c^42));
+	}
+}
+
+SHORTER IS FIRST GOOF
+in writing the script
+the script version sfrobs gave slightly different output to
+my .c version sfrobu
+I realised I was using the space in some comparisons
+instead of automatically making the shorter one be first
+
+IGNORE CASE:
+i fixed that but still the output with -f were different
+This is because qsort is not a stable sort
+and there is no stable sorting builtin to c library
+but they both ignore case with -f on so if we ignore
+case in comparing their outputs, they are the same.
+
+NEWLINES:
+also
+sfrobs and (sfrobu and sfrob) have different outputs if 
+there are   newlines   in the input
+but spec says newlines are turned into spaces
+with no new lines they output the same thing :)
+

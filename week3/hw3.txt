@@ -1,0 +1,53 @@
+Q1
+No, it's just a label for a removed goto
+ so it didn't have to be removed.
+But it was removed for readability,
+and to avoid useless (and possibly confusing) code.
+
+Q2
+We have to watch for compatibility issues:
+if a program used ls assuming a certain 
+default format that has now changed,
+we have to update the program to handle 
+the output style of this patch.
+Further, in countries where the 
+shorthand names of the months
+are different, where Oct, May,
+or Jun may make no sense,
+users could be confused.
+
+Q3
+[xian@lnxsrv09 ~/Desktop]$ ./randline.py /dev/null
+Traceback (most recent call last):
+  File "./randline.py", line 70, in <module>
+    main()
+  File "./randline.py", line 64, in main
+    sys.stdout.write(generator.chooseline())
+  File "./randline.py", line 34, in chooseline
+    return random.choice(self.lines)
+  File "/usr/lib64/python2.7/random.py", line 274, in choice
+    return seq[int(self.random() * len(seq))] 
+	 # ^raises IndexError if seq is empty
+IndexError: list index out of range
+
+Since seq is empty (because it's read from /dev/null which is empty)
+seq[0] would also cause index error since an array with nothing
+has no 0th (1st) element either.
+
+Q4
+[xian@lnxsrv09 ~/Desktop]$ python3 randline.py ~/Desktop/hw3.txt
+  File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+
+This syntax error comes because Python3 removed
+automatic tuple unpacking in lambda functions.
+We would need to reference each argument in the tuple
+by index e.g.
+	except IOError as errno_strerror
+and later do
+	errno_strerror[0] for errno
+and
+	errno_strerrpr[1] for strerror
+

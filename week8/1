@@ -1,0 +1,47 @@
+execve("./randmain", ["./randmain", "2", "2"], [/* 17 vars */]) = 0
+brk(NULL)                               = 0x180e000
+access("/etc/ld.so.nohwcap", F_OK)      = -1 ENOENT (No such file or directory)
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7884ce0000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/u/cs/ugrad/xian/Desktop/week8/tls/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/u/cs/ugrad/xian/Desktop/week8/tls/x86_64", 0x7fffe994a110) = -1 ENOENT (No such file or directory)
+open("/u/cs/ugrad/xian/Desktop/week8/tls/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/u/cs/ugrad/xian/Desktop/week8/tls", 0x7fffe994a110) = -1 ENOENT (No such file or directory)
+open("/u/cs/ugrad/xian/Desktop/week8/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/u/cs/ugrad/xian/Desktop/week8/x86_64", 0x7fffe994a110) = -1 ENOENT (No such file or directory)
+open("/u/cs/ugrad/xian/Desktop/week8/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/u/cs/ugrad/xian/Desktop/week8", 0x7fffe994a110) = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=37369, ...}) = 0
+mmap(NULL, 37369, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f7884cd6000
+close(3)                                = 0
+access("/etc/ld.so.nohwcap", F_OK)      = -1 ENOENT (No such file or directory)
+open("/lib/x86_64-linux-gnu/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\240\r\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0644, st_size=14608, ...}) = 0
+mmap(NULL, 2109680, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f78847f0000
+mprotect(0x7f78847f3000, 2093056, PROT_NONE) = 0
+mmap(0x7f78849f2000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7f78849f2000
+close(3)                                = 0
+access("/etc/ld.so.nohwcap", F_OK)      = -1 ENOENT (No such file or directory)
+open("/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\t\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1864888, ...}) = 0
+mmap(NULL, 3967392, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f7884420000
+mprotect(0x7f78845df000, 2097152, PROT_NONE) = 0
+mmap(0x7f78847df000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1bf000) = 0x7f78847df000
+mmap(0x7f78847e5000, 14752, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f78847e5000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7884cd0000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7884cc0000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7884cb0000
+arch_prctl(ARCH_SET_FS, 0x7f7884cc0700) = 0
+mprotect(0x7f78847df000, 16384, PROT_READ) = 0
+mprotect(0x7f78849f2000, 4096, PROT_READ) = 0
+mprotect(0x601000, 4096, PROT_READ)     = 0
+mprotect(0x7f7884c25000, 4096, PROT_READ) = 0
+munmap(0x7f7884cd6000, 37369)           = 0
+write(2, "./randmain: usage: ./randmain NB"..., 37./randmain: usage: ./randmain NBYTES
+) = 37
+exit_group(1)                           = ?
++++ exited with 1 +++

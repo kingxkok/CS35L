@@ -1,0 +1,146 @@
+
+TIMING
+
+command:
+ time ./sfrob[u or s] < big.txt > out.txt
+
+sfrobu is FASTER than sfrob!!!!
+with 16MiB file
+
+sfrob does 
+real ~2s
+user ~1.5s
+sys ~0.5s
+
+sfrobu does
+real ~0.7s
+user ~0.6s
+sys ~0.1s
+
+sfrobu -f does
+real ~1.2s
+user ~1s
+sys ~0.1s
+
+sfrobs does
+real ~4.4s
+user ~1.3s
+sys ~2s
+
+sfrobs -f does
+real ~4.9s
+user ~1.3s
+sys ~2.5s
+
+In sfrobu, read is called only twice if the file isn't growing
+whereas with getchar in sfrob, it's called every 512 bytes
+
+write is also only called once in sfrobu vs multiple in sfrob
+
+Hehe I dun better than lib functions hehe :D
+
+sfrobs is slower because I have multiple trs to compress spaces
+and an sed (I couldn't figure out any other way e.g. with tr)
+to remove the leading spaces
+
+-f ignore case flag slows down both sfrobu and sfrobs
+but sfrobs increased in sys time 
+while sfrobu increased in user time
+(sfrobu increased in user time since the frobcmp function
+ignoring case had double the if statements, so makes sense that
+user time doubles)
+I would guess sfrobs's has sort in a system call
+
+
+Peculiarly, with
+ time cat big.txt | ./sfrob[u or s] > out.txt
+sfrobs complete in ~5 seconds still while
+sfrobu takes over a minute 
+this probably has to do with how the cat function
+interacts with my implementation's calling of read()
+builtin tr and sort probably has optimizations for piping
+
+
+
+
+
+
+sfrobu with 
+DIFFERENT INPUT LINES
+
+cp big.txt big2.txt
+cat big2.txt >> big.txt
+until big.txt was over 200mb
+
+initially had 8mb to 64 mb files but found that they all had
+~0.7s user time
+this must be a constant amount of time that the sort time adds on to
+but qsort time was insignificant until 128mb+
+
+head -c 134217728 < big.txt > 128mb.txt
+shuf 128mb.txt > 256mb.txt
+shuf 128mb.txt >> 256mb.txt
+
+repeat with 256 into 512, etc
+
+until i have 128, 256, 512, 1024 mb files
+
+
+time ./sfrobu < 128mb.txt >out.txt
+time ./sfrobu < 256mb.txt >out.txt
+time ./sfrobu < 512mb.txt >out.txt
+time ./sfrobu < 1024mb.txt >out.txt
+
+
+kingxkok@DESKTOP-07FOJ2K:/mnt/c/Users/Ng Xian Kai/Desktop$ time ./sfrobu < 64mb.txt >out.txt
+
+real    0m0.782s
+user    0m0.641s
+sys     0m0.047s
+kingxkok@DESKTOP-07FOJ2K:/mnt/c/Users/Ng Xian Kai/Desktop$ time ./sfrobu < 128mb.txt >out.txt
+real    0m0.810s
+user    0m0.656s
+sys     0m0.078s
+kingxkok@DESKTOP-07FOJ2K:/mnt/c/Users/Ng Xian Kai/Desktop$ time ./sfrobu < 256mb.txt >out.txt
+
+real    0m2.480s
+user    0m2.250s
+sys     0m0.109s
+kingxkok@DESKTOP-07FOJ2K:/mnt/c/Users/Ng Xian Kai/Desktop$ time ./sfrobu < 512mb.txt >out.txt
+
+real    0m5.720s
+user    0m5.078s
+sys     0m0.375s
+kingxkok@DESKTOP-07FOJ2K:/mnt/c/Users/Ng Xian Kai/Desktop$ time ./sfrobu < 1024mb.txt >out.txt
+
+real    0m12.670s
+user    0m11.297s
+sys     0m0.438s
+kingxkok@DESKTOP-07FOJ2K:/mnt/c/Users/Ng Xian Kai/Desktop$ time ./sfrobu < 2048mb.txt >out.txt
+
+real    0m26.310s
+user    0m23.237s
+sys     0m0.518s
+
+take user time since it's the one doing the qsort
+
+if we subtract 128, 256, 512, and 1024 by 64's user time:
+ 128: 0015ms
+ 256: 1609ms
+ 512: 4437ms
+1024: 10656ms
+2048: 22596ms
+
+The uncertainty between 128 and 64's difference is too significant so we ignore that
+but for 256, 512, 1024, and 2048 we see a clear NlogN growth number of comparisons
+(it approaches NlogN as it grows)
+
+4437/1609 = 2.75
+512*log(512) / 256*log(256) = 2.25
+10656/4437 = 2.4016
+1024*log(1024) / 512*log(512) = 2.22
+23596/10656 = 2.2143
+2048*log(2048) / 1024*log(1024) = 2.2
+
+the number of comparisons is approximately N*log(N)
+where log is log base 2, and N is the number of input lines

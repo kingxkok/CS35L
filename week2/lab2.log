@@ -1,0 +1,171 @@
+did locale to check
+export LC_ALL='C'
+locale again
+
+sort /usr/share/dict/words > ~/Desktop
+to copy and sort
+
+sort was kinda weird coz there were words starting with ZZ
+but they came before zy after sort
+but it actually makes sense cz Z < z in
+case-sensitive alphanum
+
+copy assignment url
+and Wget [right-click] to save the webpage html
+
+
+tr -c 'A-Za-z' '[\n*]'
+replaces non-alphabet chars with a newline
+
+tr -cs 'A-Za-z' '[\n*]'
+does above but also compressed adjacent newlines to a single newline
+
+tr -cs 'A-Za-z' '[\n*]' | sort
+does above and sorts the words
+
+tr -cs 'A-Za-z' '[\n*]' | sort -u
+also removes duplicates
+
+tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+compares with words
+
+tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 words
+supress cols 2 and 3 meaning
+only words unique to assign2.html will show
+
+
+wget http://mauimapp.com/moolelo/hwnwdseng.htm
+get the webpage
+
+sed s/\<.u\>//g < hwnwdseng.htm > out1
+to remove </u> (underlines)
+
+sed s/\<u\>//g < out1 > out2
+to remove <u>
+
+   couldn't do both at same time using sed s/\<.?u\>//g < out1 > out2 nor
+   	    sed s/\.\?<u\>//g < out1 > out2 ... not sure why...
+
+
+tr '`' \' <  out2 > out3
+replaces ` with '
+
+sed '1,/Adopt/d' < out3 > out4
+removes every line from first line up to and 
+incl. the first english word 'adopt'
+
+
+tried to remove last few lines without replacing Kou using
+a variation on sed '/start/,/stop/ s/#.*//'
+but didn't work so instead I did
+sed 's/Kou/Kou\neeennnddd/' < out4 > out5 to mark the end of useful part of file
+then  	sed '/eeennnddd/,$d' < out5 > out6
+removes all the trailing lines
+
+sed '/\<tr\>/,/\<td\>/ d' < out6 > out7
+removes the english words
+
+sed s/\<td\>// < out7 > out8
+remove <td>
+
+sed s/\<.td\>// < out8 > out9
+remove </td>
+
+ tr -c 'pkmnwlhaeiouPKMNWLHAEIOU\,'\'[:space:] '[@*]' < out9 | less
+ i was checking for invalid chars
+
+tr A-Z a-z < out9 > out10
+toLowerCase()
+
+tr -c 'pkmnwlhaeiouPKMNWLHAEIOU\,'\'[:space:] '[@*]' < out10 > out11
+marks any invalid chars with '@'
+
+tr -cs 'pkmnwlhaeiouPKMNWLHAEIOU'\'\@ '[\n*]' < out11 > out12
+reformats  into words seperated by lines
+	   by replacing commas and spaces with newlines
+	   and compressing adjacent newlines
+
+sed -e '/\@/d'  -e '/^$/ d' < out12 > out13
+removes empty lines and words with invalid '@' marker
+
+sort out13 -u > out14
+sort and removes duplicates
+
+
+
+
+Counting 'misspelled' words
+
+tr -cs 'A-Za-z' '[\n*]' < hwnwdseng.htm | tr 'A-Z' 'a-z' | sort -u | \
+comm  -23 -  words | sed -e '/^$/ d' | wc -l
+outputs 143.
+143 'misspelled' English words.
+
+tr -cs 'A-Za-z' '[\n*]' < hwnwdseng.htm | tr 'A-Z' 'a-z' | sort -u | \
+comm  -23 -  hwords | sed -e '/^$/ d' | wc -l
+outputs 394.
+394 'misspelled' Hawai'ian words
+
+
+
+
+
+
+Changing to HARDLINKS
+
+General structure is easy
+For all files in the directory
+cmp with itself to check if permission is there 
+(print the error if not)
+compare with the other files in the directory using cmp
+if they are the same (i.e. if cmp returns an empty string),
+change whichever file is lexicographically 2nd
+where ('.' is the first) 
+into a hardlink 
+using ln -f "$FILE" "$FILE2" (if FILE comes first)
+
+to get the list of regular files in the dir
+ dir=$1
+ RESULT=`find $dir -maxdepth 1 -type f | sed 's= =\\\/=g'`
+We use sed to turn spaces into \/ in order for the
+for loop 
+for FILE in $RESULT
+to not split apart a single file with a name containing a space
+into multple files.
+
+Inside the for loop,
+FILE=`echo $FILE | sed 's=\\\/= =g'`
+reverts the FILE back into its original name w/ the spaces
+
+ cmp "$FILE" "$FILE"
+checks if the file is readable
+or otherwise errors, and prints the error
+
+nest another for loop to compare files
+and do
+ FILE2=`echo $FILE2 | sed 's=\\\/= =g'`
+for the 2nd file to be reverted as well
+
+ difference=$(cmp "$FILE" "$FILE2" 2>&1)
+stores the cmp result, incl. the 'error' messages
+like EOF, into $difference
+ if  [[  -z  $difference  && "$FILE" != "$FILE2"  ]]
+if $difference is empty and the files are not the same file,
+ do a chain of ifs and elifs to check which file is 
+ lexicographically first and turn the other file into a 
+ hard link. It doesn't REALLY matter which we turn into
+ a hard link, since hardlinks are indistinguishable
+ from the original file...
+
+originally the program would fail for many reasons
+incl. because bash is space sensitive so things inside an 
+if statement bracket would need to have cushioning spaces
+and double brackets are needed for string comparisons
+Also, comparing cmp $FILE $FILE2
+didn't work for files with spaces
+and likewise for ln -f $FILE $FILE2
+so the $FILE and $FILE2 need enclosing ""
+i.e. "$FILE" and "$FILE2"
+
+Also need to watch for syntax errors like unclosed `` or ''
+and missing dollar signs

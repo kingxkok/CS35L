@@ -1,0 +1,35 @@
+1. Still secure in public/private key system
+even if they get all the bits transferred they can't decrypt the message
+since only the private key can (and only our machine has the private key)
+Also very very computationally difficult to discover the private key
+from the public key. Thus, secure.
+
+(1) Still secure since the same keystrokes and password
+will generate different private keys. So they stil can't
+find our private keys.
+
+(2) If the private keys' data are stored on the USBs, then they can
+read it and use it to decrypt our communcations over the network.
+Else, the network is still secure since they don't have them private keys.
+Since we're booting off USB the system files would probably be stored
+on the USB since keeping it on the machine instead would probably
+make it easier to access, rather than just leaving it on the USB
+where it's physically easier to keep access limited. 
+So if the hackers had physical control of the USB,
+they could proabably find the privavte keys and eavesdrop
+on our network.
+
+However, if the keyboard continue to be tapped and the
+messages are all typed (no GUI), then obviously 
+they can see what we typed and thus the communication
+privacy is compromised. The network itself, however,
+remains secure.
+
+2. gpg --verify only verifies that the target file and 
+detached signature match. Some other guy can open the tar
+change the public key, retar, and output a signature
+using the same name and email and comment
+
+the gpg --verify wouldn't be able to tell if those files
+were made by me or not, just that the file and the sign
+match.

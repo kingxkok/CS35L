@@ -1,0 +1,421 @@
+Week 9 Lab: Managing Change
+Ng Xian Kai
+
+1. clone from savannah repo
+$ git clone https://git.savannah.gnu.org/git/diffutils.git
+2.
+$ cd diffutils
+$ git log > ../git-log.txt
+3.
+$ git tag > ../git-tags.txt
+
+4.
+$ cat ../git-log.txt | grep -A 20 -B 20 'maint: quote'
+
+we find:
+
+[...]
+commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f
+Author: Paul Eggert <eggert@cs.ucla.edu>
+Date:   Wed Jan 25 23:46:16 2012 -0800
+
+    maint: quote 'like this' or "like this", not `like this'
+    
+    This is in response to a recent change in the GNU coding standards,
+        which now suggest quoting 'like this' or "like this", instead of
+        `like this' or ``like this''.
+        * HACKING, NEWS, README, README-hacking, TODO, doc/diagmeet.note:
+        * doc/diffutils.texi, ms/config.bat, ms/config.site:
+        [...]
+    
+
+We want to use this patch so:
+$ git format-patch -1 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f 
+$ cp 0001-maint-quote-like-this-or-like-this-not-like-this.patch quote-patch.txt
+
+5.
+$ git checkout v3.0
+
+6.
+$ patch -p1 < quote-patch.txt
+
+
+Can't find 
+doc/diffutils.texi  
+HACKING
+man/help2man
+
+Some other changes were rejected, which I also skipped thru by pressing enter
+the rejected c file changes are:
+$ ls -R | grep .c.rej
+diff3.c.rej
+diff.c.rej
+
+
+7.
+$ git status
+HEAD detached at v3.0
+# Changed but not updated:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#       modified:   NEWS
+#       modified:   README
+#       modified:   TODO
+#       modified:   doc/diagmeet.note
+#       modified:   ms/config.bat
+#       modified:   ms/config.site
+#       modified:   po/en.po
+#       modified:   src/analyze.c
+#       modified:   src/cmp.c
+#       modified:   src/context.c
+#       modified:   src/diff.c
+#       modified:   src/diff.h
+#       modified:   src/diff3.c
+#       modified:   src/dir.c
+#       modified:   src/ifdef.c
+#       modified:   src/io.c
+#       modified:   src/sdiff.c
+#       modified:   src/side.c
+#       modified:   src/system.h
+#       modified:   src/util.c
+#       modified:   tests/help-version
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#       0001-maint-quote-like-this-or-like-this-not-like-this.patch
+#       NEWS.orig
+#       README-hacking.orig
+#       README-hacking.rej
+#       README.orig
+#       README.rej
+#       cfg.mk.orig
+#       cfg.mk.rej
+#       git-log.txt
+#       git-tags.txt
+#       ms/config.site.orig
+#       quote-patch.txt
+#       src/cmp.c.orig
+#       src/context.c.orig
+#       src/diff.c.orig
+#       src/diff.c.rej
+#       src/diff.h.orig
+#       src/diff3.c.orig
+#       src/diff3.c.rej
+#       src/dir.c.orig
+#       src/sdiff.c.orig
+#       src/system.h.orig
+#       src/util.c.orig
+#       tests/help-version.orig
+no changes added to commit (use "git add" and/or "git commit -a")
+
+
+
+8. Emacs is not fun for me :c
+But learned it from the links (but can you really learn emacs?)
+
+9. Used emacs C-x v-u to revert some files, but also found these commands useful:
+
+git show to show the commit hash of v3
+commit no.: 022cd5c5eb647a22a4daa5fe5cbc10af6d5a1112
+doing  
+$git checkout 022cd5c5eb647a22a4daa5fe5cbc10af6d5a1112 -- NEWS
+reverts NEWS to its v3 form
+I tested by using emacs' revert command, backing that file up,
+then using this checkout method.
+$diff NEWS ../NEWS_emacs
+outputs nothing
+
+Reverted 
+	NEWS README TODO doc/diagmeet.note ms/config.bat ms/config.site po/en.po  
+		src/diff.h src/system.h tests/help-version
+		
+$ git checkout 022cd5c5eb647a22a4daa5fe5cbc10af6d5a1112 -- \
+NEWS README TODO doc/diagmeet.note ms/config.bat ms/config.site po/en.po  src/diff.h src/system.h tests/help-version
+
+After using emacs and git checkout to revert (using git status multiple times
+to check which non c files are still modified),
+check the new status:
+
+[xian@lnxsrv09 ~/Desktop/diffutils]$ git status
+On branch my3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+    (use "git checkout -- <file>..." to discard changes in working directory)
+    
+        modified:   src/analyze.c
+                modified:   src/cmp.c
+                modified:   src/context.c
+                modified:   src/diff.c
+                modified:   src/diff3.c
+                modified:   src/dir.c
+                modified:   src/ifdef.c
+                modified:   src/io.c
+                modified:   src/sdiff.c
+                modified:   src/side.c
+                modified:   src/util.c
+                
+Only c files are different from v3!
+
+check each c file using emacs src/[something].c
+C-x v =   to see which changes are in comments, 
+or otherwise not a change of ` to '
+
+we find that 
+src/analyze.c src/context.c src/ifdef.c src/io.c src/side.c
+have no changes relevant to grave->apostophe change in code
+
+Other files I changed certain lines; I left some
+comments in the changed form since they reflect
+the move from ` to '
+
+src/cmp.c, lines 36, 364, 377 
+src/diff.c, lines 40, 57, 92
+src/diff3.c, lines 35, 159, 1475
+src/dir.c, lines 84, 125, 234
+src/sdiff.c, lines 35, 92, 747
+src/util.c, line 27, 121, 146, 190, 241, 270, 650
+
+
+from https://www.emacswiki.org/emacs/ApplyingPatches:
+Diff Mode can be used to selectively remove changes from a file. 
+   
+       Do ‘M-n’ to get to the first hunk.
+        Here, if you do ‘C-c C-a’ (apply hunk), you will see “Hunk already applied.”
+        If you wish to back out the change in this hunk, do ‘C-u C-c C-a’ to “un-apply” the hunk.
+        Continue as desired.
+        
+KEY: C-u C-c C-a to revert change (or C-c C-a and say yes to undo hunk)
+
+Note: with the comments update removed, the comments
+don't reflect the code changes--this is probably
+bad for maintainability 
+
+10.
+
+Earlier is of .c.rej with comments:
+diff3.c.rej
+diff.c.rej
+
+
+To manually apply changes, I C-s ` and changed it to ' 
+if it wasn't in a comment. Emacs' coloring is helpful :D
+
+11.
+mv quote-patch.txt ../
+git clean -f
+
+12.
+$ git status
+HEAD detached at v3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+    (use "git checkout -- <file>..." to discard changes in working directory)
+    
+        modified:   src/cmp.c
+                modified:   src/diff.c
+                modified:   src/diff3.c
+                modified:   src/dir.c
+                modified:   src/sdiff.c
+                modified:   src/util.c
+                
+no changes added to commit (use "git add" and/or "git commit -a")
+
+ git diff > ../quote-3.0-patch.txt
+ 
+$ cd ..
+Sanity check for whether it's 300-400 lines
+$ wc quote-3.0-patch.txt  -l
+326 quote-3.0-patch.txt
+
+13.
+/usr/local/cs/bin was already in my $PATH from cs33 hehe :)
+So I just run
+$ ./bootstrap
+$ ./configure
+$ make
+
+$ make
+Making all in lib
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+  GEN      alloca.h
+    GEN      arg-nonnull.h
+    [...]
+ In file included from localcharset.c:28:0:
+ ./stdio.h:434:1: error: 'gets' undeclared here (not in a function); did you mean 'fgets'?
+ _GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+  ^
+  [...]
+ make: *** [Makefile:1016: all-recursive] Error 1
+
+this is probably a bad idea in terms of security but owel,
+I changed the lib/stdio.h file.
+I looked for the warning 
+ _GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+  using C-s gets
+  and found
+  #undef gets
+ So I commented out the gets removing line
+//#undef gets
+as well as
+//_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+
+Alt:
+$ sed 's/#undef gets/\/\/#undef gets/' lib/stdio.h -i
+$ sed 's/_GL_WARN_ON_USE (gets/\/\/_GL_WARN_ON_USE (gets/' -i lib/stdio.h
+
+try make again:
+$ make
+[...]
+/tmp/ccyWn06r.s: Fatal error: can't close sh-quote.o: Disk quota exceeded
+[...]
+
+So I deleted some files
+rm -rf diffutils2 //I was using it as testing grounds
+
+$ make
+(again)
+[...looong output...]
+
+$ make check
+Making check in lib
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make  check-recursive
+make[2]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make[3]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make[3]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make[2]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make[1]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+Making check in src
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+make  check-am
+make[2]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+make[2]: Nothing to be done for 'check-am'.
+make[2]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+make[1]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+Making check in tests
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make  check-TESTS
+make[2]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make[3]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+/bin/sh: /bin/sh: cannot execute binary file
+make[3]: *** [Makefile:1309: basic.log] Error 126
+make[3]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make[2]: *** [Makefile:1291: check-TESTS] Error 2
+make[2]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make[1]: *** [Makefile:1403: check-am] Error 2
+make[1]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make: *** [Makefile:1016: check-recursive] Error 1
+
+has those errors 126,2,1 but we have
+src/cmp src/diff src/diff3 src/sdiff
+exectuables so it's all good
+
+
+
+WAS WHAT I DID BUT I READ THE INSTRUCTIONS AND LOL I NEEDED
+TO JUST PATCH WITH
+http://web.cs.ucla.edu/classes/fall17/cs35L/assign/diffutils-gets.diff
+for the gets error
+
+so 
+$ git reset --hard
+$ patch -p1 < ../quote-3.0-patch.txt (GLAD I SAVED IT OUTSIDE HAHA)
+$ ./bootstrap
+[...a lot of stuff..]
+$ ./configure
+[...a lot of stuff..]
+$ make
+[...a lot of stuff... then error]
+$ make check
+[...a lot of stuff... then error]
+$ wget http://web.cs.ucla.edu/classes/fall17/cs35L/assign/diffutils-gets.diff
+$ patch -p1 < diffutils-gets.diff
+asks which file to patch since old/stdio.in.h doesn't exist
+so I told it to use lib/stdio.in.h
+$ make
+[...a lot of stuff..]
+$ make check
+Making check in lib
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+  GEN      configmake.h
+  make  check-recursive
+  make[2]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make[3]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+  GEN      configmake.h
+  make[3]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+  make[2]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+make[1]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/lib'
+Making check in src
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+make  check-am
+make[2]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+make[2]: Nothing to be done for 'check-am'.
+make[2]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+make[1]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/src'
+Making check in tests
+make[1]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make  check-TESTS
+make[2]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make[3]: Entering directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+/bin/sh: /bin/sh: cannot execute binary file
+make[3]: *** [Makefile:1309: basic.log] Error 126
+make[3]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make[2]: *** [Makefile:1291: check-TESTS] Error 2
+make[2]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make[1]: *** [Makefile:1403: check-am] Error 2
+make[1]: Leaving directory '/w/home.15/cs/ugrad/xian/Desktop/diffutils/tests'
+make: *** [Makefile:1017: check-recursive] Error 1
+
+still has those errors 126,2,1 but we have
+src/cmp src/diff src/diff3 src/sdiff
+exectuables so it's all good
+
+$ ./src/diff --help  | grep '`'
+$ ./src/diff . - 2>&1 | grep '`'
+$ ./src/sdiff . - 2>&1 | grep '`'
+and other tests with diff3 and cmp
+output no grave accents
+so yay!
+
+14.
+Approach: commit current changes,
+copy c files to outside folder,
+revert to v3.0,
+check diff
+
+$ git commit . -m "patched v3: grave accent => apostrophe " 
+$ mkdir ../diffutils-3.0-patch
+$ cp src/*.c ../diffutils-3.0-patch
+$ git checkout v3.0
+$ mkdir ../diffutils-3.0
+$ cp src/*.c ../diffutils-3.0
+$ diffutils/src/diff -pru diffutils-3.0 diffutils-3.0-patch > quote-3.0-test.txt
+
+15.
+$ diff quote-3.0-test.txt quote-3.0-patch.txt
+outputs stuff so not identical but the changes innocuous
+$ emacs quote-3.0-test.txt quote-3.0-patch.txt
+to eyeball and make sure they're almost alike
+since diff of diffs syntax gets trippy
+
+...yeah its innocuous
+
+Innocuity sanity check:
+$ git revert v3.0
+$ patch -p1 < ../quote-3.0-patch.txt
+do the configure n make stuff
+it works!
+yay.
+$ git revert v3.0
+$ patch -p1 < ../quote-3.0-test.txt
+do the configure n make stuff
+it works!
+yay.
+
+(actually at first the patching wasn't working for util.c,
+turns out it was because i didn't do git revert v3.0 
+before patching with quote-3.0-test.txt
+so I was trying to patch the already patched files hehexd)
+

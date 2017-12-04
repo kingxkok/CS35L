@@ -1,0 +1,79 @@
+Commands to compare times
+time -p sort -g > /dev/null
+time -p sort -g --parallel [No. threads] randfloat.txt > dev/null
+
+Command to create 10 million floats (80mio bytes). Cut removes the first words in a line (byte numbers).
+trs compresses all adjacent spaces and newlines into a single newline. sed deletes empty lines
+cat /dev/urandom | od -tf -N 80000000 | cut -d' ' -f2-  | tr [:space:] '\n' | tr -s '\n' | sed '/./,$!d' > randfloat. 
+ 
+[xian@lnxsrv09 ~/Desktop]$ nproc
+32
+So there are 32 cores. I checked and the processor is hyperthreaded so 64 logical cores.
+
+I did each command thrice at ~2pm on Friday (Veteran's day) 
+so it should be low load on the server
+and averaged the results
+
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g randfloat.txt > /dev/null 
+real 37.06 
+user 197.48 
+sys 2.02
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 1 randfloat.txt > /dev/null 
+real 227.26 
+user 215.56 
+sys 0.31 
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 2 randfloat.txt > /dev/null 
+real 100.83 
+user 190.40 
+sys 0.47
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 4 randfloat.txt > /dev/null 
+real 59.31 
+user 195.49 
+sys 1.45
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 8 randfloat.txt > /dev/null
+real 44.99
+user 250.21
+sys 0.74
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 16 randfloat.txt > /dev/null 
+real 31.49 
+user 247.97 
+sys 3.97
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 32 randfloat.txt > /dev/null 
+real 26.37 
+user 326.46 
+sys 2.93
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 64 randfloat.txt > /dev/null 
+real 25.41 
+user 325.72 
+sys 4.41
+[xian@lnxsrv09 ~/Desktop]$ time -p sort -g --parallel 128 randfloat.txt > /dev/null 
+real 36.54 
+user 326.99 
+sys 4.90
+ 
+Real time:
+It is expensive to spin up and join new threads; this overhead and
+the merging O(N*log(no. threads)) of the multiple individually sorted files 
+make the gains less than double (barely gain speed after 8 cores),
+even though NlogN / (N/2 * log(N/2)) should be > 2.
+With beyond 64 threads, sort actually slows down because only 64 logical cores 
+(32 with hyperthreading) are avaliable on the SEAS machine. 
+
+System time:
+increases with threads as the system has to manage the requesting of
+new threads and joining of the threads.
+
+User time: 
+Grows slightly with the number of threads.
+Since user time counts the time from each core and adds them up, 
+with the added overhead of multithreading, 
+it makes sense for the user time should go up slightly.
+
+Checked with strace and the sort.c file to see why sort without --parallel
+still has less real time than user time
+strace sort -g randfloat.txt .> /dev/null &> nopar.txt 
+cat nopar.txt | less
+reveals a lot of futexes
+
+sort must be running with multiple threads by default--
+without the --parallel flag!

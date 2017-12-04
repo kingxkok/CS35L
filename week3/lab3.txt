@@ -1,0 +1,99 @@
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+tar -xvf coreutils-7.6.tar.gz 
+cd coreutils-7.6 
+./configure 
+make 
+make install 
+cd src 
+./ls -l 
+mv ls old_ls #to preserve the old unmodifed ls
+emacs ls.c 
+cd ../.. 
+make 
+ 
+I downloaded the coreutils to the seas machine via wget
+Then I untared and ran the standard install commands. 
+./configure builds a new Makefile 
+make builds the program  
+(looks into Makefile and does as instructed) 
+this builds an executable program 
+make install invokes make and finds  
+target 'install' to install the program 
+Then I added the patch via typing on emacs 
+and executed make again. 
+There were no unexpected issues. 
+ 
+ 
+make  all-recursive 
+goes into each folder recursively and calls make 
+ 
+Making all in lib 
+make  all-recursive 
+ 
+Making all in src 
+make  all-am 
+  CC     ls.o   #needs to be executed since ls was changed 
+  CCLD   dir	#dir is derived from ls so also needs recompiling 
+  CCLD   vdir	#vdir is also 
+  CCLD   ls	#ls was changed so needs recompiling 
+Making all in doc 
+Making all in man 
+  GEN    dir.1 	#gens a placeholder in the man page for the changed files 
+  GEN    vdir.1	#same^ 
+  GEN    ls.1	#same^ 
+Making all in po 
+Making all in tests 
+Making all in gnulib-tests 
+make  all-recursive 
+ 
+We see that most entries into dirs lead to leaves without doing anything. 
+This is because most things haven't been changed and don't 
+need to be recompiled. 
+
+
+then:
+
+make install #install changes
+cd src
+./ls -l #fixed version outputs MMM DD HH:MM for <1yrold files,
+								MMM DD YYYY otherwise
+./old_ls -l #old version outputs YYYY-MM-DD HH:MM
+
+####
+NEW
+####
+[xian@lnxsrv09 ~/Desktop/coreutils-7.6/src]$ ./ls -l | grep ls
+-rwxr-xr-x 1 xian csugrad  86232 Oct 23 11:44 false
+-rw-r--r-- 1 xian csugrad     51 Sep  1  2009 false.c
+-rw-r--r-- 1 xian csugrad  16960 Oct 23 11:44 false.o
+-rwxr-xr-x 1 xian csugrad 464464 Oct 23 11:59 ls
+-rw-r--r-- 1 xian csugrad 144367 Oct 23 11:59 ls.c
+-rw-r--r-- 1 xian csugrad     44 Sep  1  2009 ls-dir.c
+-rw-r--r-- 1 xian csugrad   2096 Oct 23 11:44 ls-dir.o
+-rw-r--r-- 1 xian csugrad    201 Sep  1  2009 ls.h
+-rw-r--r-- 1 xian csugrad     37 Sep  1  2009 ls-ls.c
+-rw-r--r-- 1 xian csugrad   2096 Oct 23 11:44 ls-ls.o
+-rw-r--r-- 1 xian csugrad 508696 Oct 23 11:59 ls.o
+-rw-r--r-- 1 xian csugrad     46 Sep  1  2009 ls-vdir.c
+-rw-r--r-- 1 xian csugrad   2096 Oct 23 11:44 ls-vdir.o
+-rwxr-xr-x 1 xian csugrad 464616 Oct 23 11:44 old_ls
+
+
+####
+OLD
+####
+[xian@lnxsrv09 ~/Desktop/coreutils-7.6/src]$ ./old_ls -l | grep ls
+-rwxr-xr-x 1 xian csugrad  86232 2017-10-23 11:44 false
+-rw-r--r-- 1 xian csugrad     51 2009-09-01 04:01 false.c
+-rw-r--r-- 1 xian csugrad  16960 2017-10-23 11:44 false.o
+-rwxr-xr-x 1 xian csugrad 464464 2017-10-23 11:59 ls
+-rw-r--r-- 1 xian csugrad 144367 2017-10-23 11:59 ls.c
+-rw-r--r-- 1 xian csugrad     44 2009-09-01 04:01 ls-dir.c
+-rw-r--r-- 1 xian csugrad   2096 2017-10-23 11:44 ls-dir.o
+-rw-r--r-- 1 xian csugrad    201 2009-09-01 04:01 ls.h
+-rw-r--r-- 1 xian csugrad     37 2009-09-01 04:01 ls-ls.c
+-rw-r--r-- 1 xian csugrad   2096 2017-10-23 11:44 ls-ls.o
+-rw-r--r-- 1 xian csugrad 508696 2017-10-23 11:59 ls.o
+-rw-r--r-- 1 xian csugrad     46 2009-09-01 04:01 ls-vdir.c
+-rw-r--r-- 1 xian csugrad   2096 2017-10-23 11:44 ls-vdir.o
+-rwxr-xr-x 1 xian csugrad 464616 2017-10-23 11:44 old_ls

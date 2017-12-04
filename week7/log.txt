@@ -1,0 +1,244 @@
+Xian Kai Ng 
+Partner: Xilai Zhang
+SSH Lab log
+
+Connected the beaglebone and did the setup
+(install drivers)
+...seems simple but the driver files
+were not signed properly 
+so it wouldn't install on windows 10
+
+we found this other distribution on github
+with the properly signed BONE_D64.exe
+
+After drivers installed,
+ssh into beaglebone
+ssh root@192.168.7.2
+
+connmanctl 
+to connect the board to wifi
+
+Start the connmanctl terminal:
+sudo connmanctl
+ 
+Turn on the wifi for your BeagleBone:
+connmanctl> enable wifi
+ 
+Scan all available wifi access points:
+connmanctl> scan wifi
+ 
+List all the discovered access points:
+connmanctl> services
+ 
+Each access point has the following format:
+wifi_blablabla
+
+connmanctl> connect wifi_blablabla
+and it connects
+
+except a lot of times it can't find the wifi routers
+after scanning
+and would disconnect on its own sometimes
+perhaps the signal sucked but my computer's 
+wifi connection was fine
+...the board maybe had a not so great wifi unit
+
+after connecting to wifi
+ifconfig command
+gives the ip address of the board under wifi0
+which is the ip we ssh to from the other board
+
+
+
+Server Steps (first did on Kai's board and the Xilai acted as client)
+
+Generate public and private keys
+
+$ ssh-keygen (by default saved to ~/.ssh/is_rsa and id_rsa.pub)
+
+
+Create an account for the client on the server
+
+
+$ sudo useradd –d /home/Xilai –m Xilai
+
+
+$ sudo passwd Xilai
+
+
+Create .ssh directory for new user
+
+
+$ cd /home/Xilai
+
+
+$ sudo mkdir .ssh
+
+
+Change ownership and permission on .ssh directory
+
+
+$ sudo chown –R Xilai .ssh
+
+
+$ sudo chmod 700 .ssh
+
+
+Optional: disable password-based authentication after 
+connecting once and saving the the client board
+as an approved client (approved for key authentication)
+$ vi /etc/ssh/sshd_config
+
+
+change PasswordAuthentication option to no
+
+
+
+
+Client Steps
+
+
+Generate public and private keys
+
+
+$ ssh-keygen
+
+
+Copy your public key to the server for key-based
+authentication (~/.ssh/authorized_keys)
+
+
+$ ssh-copy-id –i Xilai@192.168.1.47
+
+
+Add private key to authentication agent (ssh-agent)
+
+$ eval $(ssh-agent -s)
+$ ssh-add
+
+
+SSH to server
+
+
+$ ssh Xilai@192.168.1.47
+
+
+$ ssh –X Xilai@192.168.1.47 
+(X11 session forwarding)
+
+
+Run a command on the remote host
+
+
+$ xterm, $ gedit, $ firefox, etc.
+
+...buuut the displaying thing didn't work
+$DISPLAY wasn't set apparently...
+and after setting it
+DISPLAY=localhost:0.0
+still didn't work
+
+turns out we need to 
+install Xlaunch on Windows to be able to display
+via x11 forwarding
+
+if when sshing use -X
+and make sure $DISPLAY was set right
+(usually localhost:0.0 or 10.0 or 11.0)
+
+and it worked!
+
+
+Some fun stuff happened when we disabled password
+authentication on the sshd_config file
+and also some other configs options
+We changed the port from 22 to 2222 since
+we were having trouble connecting, so
+maybe the port was clogged and changing ports
+could help
+(turns out the wifi was just really shyte)
+
+It still wouldn't connect even after changing ports
+because I tried
+ssh Xilai@192.168.1.47:2222 .... it should be
+ssh Xilai@192.168.1.47 -p 2222
+But I didn't know port syntax was wrong for a while
+so I kept messing with sshd_config
+
+And somehow it worked eventually after 
+I found the -p syntax
+
+but not because we changed sshd_config but rather coz 
+we connected via phone's wifi hotspot
+
+turns out sshd_config didnt need to be changed
+(although changing it to not accept password authentication makes it more secure
+after we've verfied that the user is using the right key)
+
+
+But changing the sshd_config fudged me
+after I disconnected my root@192.168.7.2 ssh
+(the main admin controlling connection to the 
+board via USB port)
+I added AllowUsers Xilai
+which thus allowed only Xilai to ssh in
+but not root
+but Xilai has no root privileges
+so after I logged out
+i couldn't ssh back in as root (LOL)
+into my beaglebone (LOL)
+so I had to hard reset
+using a microsd and sd adaptor
+(instructions on http://beagleboard.org/Support/BoneScript/updates/)
+
+Basic reset steps:
+	Download zipped image file (took a while cz 400mb)
+	Unzip with 7zip
+	Flash image onto microsd card (also a while)
+		via sd adaptor and computer's
+		sd card slot
+	Boot off the microsd by pressing user button while turning on
+	When booted, edit the /boot/uEnv.txt file on the Linux partition on the 
+		microSD card and remove the '#' on the line with 
+		'cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh'. 
+	Boot normally.
+	The board is now reset.
+
+
+
+Gotta shout out to Xilai was pretty patient cz
+I screwed both our boards by changing both's 
+sshd_config
+and actually he borrowed a friend's board
+so I almost screwed 3 people over
+
+...until we finally fixed the board and got 
+to step 0
+LUL
+
+then after that stuff was g because we realied that
+the main problem initially was nothing but
+shypitty (manure-y) wifi x d. 
+UCLA_WEB doesn't cut it
+UCLA_WIFI we couldn't use because we couldn't log in
+since there was no GUI
+except we maybe could've if we ssh -X 
+into the beaglebone from the computer and ran firefox
+but owel
+that would've presented more possible failing points
+and likely complexify the debugging process
+
+we also tried 30 30 30 reset twice
+ before resorting to sd card flashing
+...it failed
+
+after resetting to step 0 and using the 
+AndroidAP wirless instead
+stuff was smooth sailing 
+
+made sure to
+usermod -aG sudo Xilai
+just to be safe so that my users had root privilege
+so I wouldn't lock myself again
+(I was actually so out of it while doing the project
+I actually locked myself out of my dorm room LUL)

@@ -1,0 +1,16 @@
+--- coreutils-with-bug/lib/timespec.h	2005-09-21 23:05:39.000000000 -0700
++++ coreutils-with-bug-fixed/lib/timespec.h	2017-10-28 13:25:09.838109000 -0700
+@@ -45,8 +45,13 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
++  /* could overflow using 
+   int diff = a.tv_sec - b.tv_sec;
+   return diff ? diff : a.tv_nsec - b.tv_nsec;
++  so instead, use	*/
++  if(a.tv_nsec>b.tv_nsec) return 1;
++  if(a.tv_nsec<b.tv_nsec) return -1;
++  if(a.tv_nsec==b.tv_nsec) return 0;
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP
