@@ -11,7 +11,7 @@ from optparse import OptionParser
 
 
 
-class randline:
+class comm:
     def __init__(self, filename, filename2, delim):
         try:
             if filename == "-":
@@ -204,7 +204,7 @@ or available locally via: info '(coreutils) comm invocation'"""
         delim = "\n"
         if options.zero_terminated:
             delim = "\x00"
-        generator = randline(input_file, input_file_2, delim)
+        generator = comm(input_file, input_file_2, delim)
         generator.comparelines(options)
     except IOError as errno_strerror:
         parser.error("I/O error({0}): {1}".
